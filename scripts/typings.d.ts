@@ -8,7 +8,9 @@ declare const ENV:string;
 // google code-prettify
 declare const PR:any;
 
-declare const global:any;
+// TODO: put back?
+// commented this out as it was causing errors locally
+// declare const global:any;
 
 declare module jasmine {
   interface Matchers {

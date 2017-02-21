@@ -142,7 +142,7 @@ let styles = `
         </a>
       </span>
     </div>
-    <input type="text" autocomplete="false" tabindex="-1"
+    <input type="text" autocomplete="false" data-nik="a" tabindex="-1"
            (keydown)="inputEvent($event)"
            (keyup)="inputEvent($event, true)"
            [disabled]="disabled"
@@ -204,7 +204,7 @@ let styles = `
            </span>
         </span>
     </span>
-    <input type="text"
+    <input type="text" data-nik="b" 
            (keydown)="inputEvent($event)"
            (keyup)="inputEvent($event, true)"
            (click)="matchClick($event)"
@@ -259,6 +259,7 @@ export class SelectComponent implements OnInit, ControlValueAccessor {
   @Input() public textField:string = 'text';
   @Input() public childrenField:string = 'children';
   @Input() public multiple:boolean = false;
+  @Input() public inputDisabled:boolean = false;
 
   @Input()
   public set items(value:Array<any>) {
@@ -416,12 +417,14 @@ export class SelectComponent implements OnInit, ControlValueAccessor {
       return;
     }
     let target = e.target || e.srcElement;
-    if (target && target.value) {
-      this.inputValue = target.value;
-      this.behavior.filter(new RegExp(escapeRegexp(this.inputValue), 'ig'));
-      this.doEvent('typed', this.inputValue);
-    }else {
-      this.open();
+    if (!this.inputDisabled) {
+      if (target && target.value) {
+        this.inputValue = target.value;
+        this.behavior.filter(new RegExp(escapeRegexp(this.inputValue), 'ig'));
+        this.doEvent('typed', this.inputValue);
+      }else {
+        this.open();
+      }
     }
   }
 
@@ -505,15 +508,17 @@ export class SelectComponent implements OnInit, ControlValueAccessor {
       event.preventDefault();
       return;
     }
-    this.inputMode = true;
-    let value = String
-      .fromCharCode(96 <= event.keyCode && event.keyCode <= 105 ? event.keyCode - 48 : event.keyCode)
-      .toLowerCase();
-    this.focusToInput(value);
-    this.open();
-    let target = event.target || event.srcElement;
-    target.value = value;
-    this.inputEvent(event);
+    if (!this.inputDisabled) {
+      this.inputMode = true;
+      let value = String
+        .fromCharCode(96 <= event.keyCode && event.keyCode <= 105 ? event.keyCode - 48 : event.keyCode)
+        .toLowerCase();
+      this.focusToInput(value);
+      this.open();
+      let target = event.target || event.srcElement;
+      target.value = value;
+      this.inputEvent(event);
+    }
   }
 
   protected  selectActive(value:SelectItem):void {
